@@ -37,6 +37,7 @@ public class ItemView extends View {
 
                 break;
             case MotionEvent.ACTION_UP:
+
                 break;
             default:
                 break;

@@ -26,4 +26,8 @@ public class Utilities {
         Rect bounds = new Rect(0,0,30,30);
         return bounds;
     }
+
+    public static Item findItem(String query) {
+        return null;
+    }
 }

@@ -6,9 +6,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import pdi.group14.finalproject.R;
+import pdi.group14.finalproject.model.ShoppingList;
 
 
 public class MainActivity extends ActionBarActivity {
+    ShoppingList shoppingList;
+    public MainActivity() {
+        super();
+        shoppingList = new ShoppingList();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
