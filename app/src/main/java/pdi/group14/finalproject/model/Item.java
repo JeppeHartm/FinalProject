@@ -6,8 +6,10 @@ package pdi.group14.finalproject.model;
 public class Item {
     private String ID;
     private String text;
-
+    public Item(String ID){
+        this.ID = ID;
+    }
     public String getText() {
-        return text;
+        return "test";
     }
 }

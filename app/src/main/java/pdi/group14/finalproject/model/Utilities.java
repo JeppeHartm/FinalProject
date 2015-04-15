@@ -3,6 +3,8 @@ package pdi.group14.finalproject.model;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import pdi.group14.finalproject.views.ItemView;
+
 /**
  * Created by Jeppe on 07-04-2015.
  */
@@ -28,6 +30,10 @@ public class Utilities {
     }
 
     public static Item findItem(String query) {
-        return null;
+        return new Item("test");
+    }
+
+    public static ItemView[] sort(ItemView[] ivs) {
+        return ivs;
     }
 }

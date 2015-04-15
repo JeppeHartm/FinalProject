@@ -4,22 +4,38 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.RelativeLayout;
 
 import pdi.group14.finalproject.R;
+import pdi.group14.finalproject.model.Item;
 import pdi.group14.finalproject.model.ShoppingList;
+import pdi.group14.finalproject.views.ItemView;
 
 
 public class MainActivity extends ActionBarActivity {
     ShoppingList shoppingList;
+    RelativeLayout rl;
     public MainActivity() {
         super();
         shoppingList = new ShoppingList();
     }
+    public void addItem(String query){
+        Item i = shoppingList.addItem(query);
 
+        ItemView iv = new ItemView(this,null,i);
+
+        rl.addView(iv);
+        RelativeLayout.LayoutParams lp;
+        lp = (RelativeLayout.LayoutParams)findViewById(R.id.defView).getLayoutParams();
+        lp.addRule(RelativeLayout.VISIBLE,RelativeLayout.TRUE);
+        iv.setLayoutParams(lp);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        rl = (RelativeLayout) findViewById(R.id.MainLayout);
     }
 
 
@@ -43,5 +59,9 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void debug(View view){
+        addItem("test");
     }
 }

@@ -1,12 +1,18 @@
 package pdi.group14.finalproject.views;
 
+import android.app.Application;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 
 import pdi.group14.finalproject.model.Item;
@@ -28,6 +34,7 @@ public class ItemView extends View {
         this.paintBucketText = buckets[0];
         this.paintBucketBackground = buckets[1];
         this.paintBucketBorder = buckets[2];
+
     }
 
     @Override
@@ -47,7 +54,7 @@ public class ItemView extends View {
 
     @Override
     protected void onDraw(Canvas canvas){
-        super.onDraw(canvas);
+        //super.onDraw(canvas);
         Rect bounds = Utilities.getBounds(this.item);
         canvas.drawRect(bounds,paintBucketBackground);
         canvas.drawRect(bounds,paintBucketBorder);
