@@ -1,7 +1,9 @@
 package pdi.group14.finalproject.layouts;
 
 import android.content.Context;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,62 +17,175 @@ import pdi.group14.finalproject.views.ItemView;
 public class PrioritySoup extends ViewGroup {
     enum EdgeOrient {horizontal,vertical}
     enum Position {bottom,top,left,right}
+    Cluster cluster = null;
+
+    @Override
+    public void addView(View child, int index, LayoutParams params) {
+        assert child instanceof ItemView;
+        super.addView(child, index, params);
+        cluster.addItem((ItemView)child);
+    }
+
+    @Override
+    public void removeView(View view) {
+        super.removeView(view);
+        cluster.removeItem((ItemView)view);
+    }
+
+    @Override
+    public void removeViewInLayout(View view) {
+        super.removeViewInLayout(view);
+        cluster.removeItem((ItemView)view);
+    }
+
+    @Override
+    public void removeViewsInLayout(int start, int count) {
+        for(int i = start+count-1; i >= start; i--){
+            cluster.removeItem((ItemView) getChildAt(i));
+        }
+        super.removeViewsInLayout(start, count);
+    }
+
+    @Override
+    public void removeViewAt(int index) {
+        cluster.removeItem((ItemView)getChildAt(index));
+        super.removeViewAt(index);
+    }
+
+    @Override
+    public void removeViews(int start, int count) {
+        for(int i = start+count-1; i >= start; i--){
+            cluster.removeItem((ItemView)getChildAt(i));
+        }
+        super.removeViews(start, count);
+    }
+
+    @Override
+    public void removeAllViewsInLayout() {
+        super.removeAllViewsInLayout();
+        cluster = new Cluster(cluster.getOrigin().x,cluster.getOrigin().y);
+    }
+
+
     public PrioritySoup(Context context) {
         super(context);
+        cluster = new Cluster(getPaddingLeft()+(getWidth()/2),getPaddingTop()+(getHeight()/2));
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int count = getChildCount();
-        ItemView[] ivs = new ItemView[count];
-        for( int i = 0; i < count; i++){
-            ivs[i] = (ItemView)getChildAt(i);
+        for(int i = 0; i < getChildCount(); i++){
+            ItemView iv = (ItemView)getChildAt(i);
+            iv.layout();
         }
-        ivs = Utilities.sort(ivs);
 
     }
     class Cluster{
         ArrayList<Edge> freeEdges;
         ArrayList<ItemView> itemViews;
+        ArrayList<Quadruple> itemBounds;
+        public Point getOrigin() {
+            return origin;
+        }
+
         Point origin;
-        public Cluster(ItemView initial,int x, int y){
+        public Cluster(int x, int y){
             freeEdges = new ArrayList<Edge>();
             itemViews = new ArrayList<ItemView>();
+            itemBounds = new ArrayList<Quadruple>();
             origin = new Point(x,y);
-            int height = initial.getHeight();
-            int width = initial.getWidth();
-            Point ul = new Point(origin.x-(width/2), origin.y-(width/2)); //upper left
-            Point ur = new Point(origin.x+(width/2), origin.y-(width/2)); //upper right
-            Point lr = new Point(origin.x+(width/2), origin.y+(width/2)); //lower right
-            Point ll = new Point(origin.x-(width/2), origin.y+(width/2)); //lower left
-            itemViews.add(initial);
-            freeEdges.add(new Edge(ul,ur,Position.top,initial));//top
-            freeEdges.add(new Edge(ll,lr,Position.bottom,initial));//bot
-            freeEdges.add(new Edge(ul,ll,Position.left,initial));//left
-            freeEdges.add(new Edge(ur,lr,Position.right,initial));//right
+            freeEdges.add(new Edge(origin,origin,Position.top,null));
         }
+
         public void addItem(ItemView iv){
             AlignedEdge best = closestEdgeThatFits(iv.getWidth(),iv.getHeight());
             freeEdges.remove(best.E);
-            freeEdges.addAll(generateEdges(best.E,iv,best.ALIGNMENT));
+            ArrayList<Edge> newEdges = (ArrayList<Edge>) generateEdges(best.E,iv,best.ALIGNMENT,best.BACKWARDS_ALIGNED);
+            Point tl = newEdges.get(1).p1;
+            freeEdges.addAll(newEdges);
+            itemBounds.add(new Quadruple(tl.x,tl.x+iv.getWidth(),tl.y,tl.y+iv.getHeight(),iv));
             itemViews.add(iv);
-
         }
-
-        private Collection<? extends Edge> generateEdges(Edge edge, ItemView iv, Point anchor) {
+        public void removeItem(ItemView iv){
+            assert iv!=null;
+            int index = itemViews.indexOf(iv);
+            ArrayList nIVs = (ArrayList) itemViews.subList(0,index);
+            nIVs.remove(iv);
+            ArrayList dep = (ArrayList) itemViews.subList(index,itemViews.size()-1);
+            dep.remove(iv);
+            itemViews = nIVs;
+            for(int i = 0; i < freeEdges.size(); i++){
+                if(freeEdges.get(i).itemView == iv) {
+                    freeEdges = (ArrayList)freeEdges.subList(0,i-1);
+                    break;
+                }
+            }
+            for( ItemView e: (ArrayList<ItemView>)dep){
+                addItem(e);
+            }
+            for( Quadruple q: itemBounds){
+                if(q.getIv()==iv){
+                    itemBounds.remove(q);
+                    break;
+                }
+            }
+        }
+        private Collection<? extends Edge> generateEdges(Edge edge, ItemView iv, Point anchor, boolean backwardsAligned) {
             ArrayList<Edge> output = new ArrayList<Edge>();
-            if()
+            int edif;
+            int h = iv.getHeight(), w = iv.getWidth();
+            Point tl = null,tr,bl,br;
             switch(edge.position){
                 case top:
+                    tl = new Point(backwardsAligned?anchor.x-w:anchor.x,anchor.y-h);
+                    edif = edge.getSize()-w;
+                    if(edif > 0){
+                        Point rp1 = new Point(backwardsAligned?anchor.x-edge.getSize():anchor.x+w,anchor.y);
+                        Point rp2 = new Point(rp1.x+edif,anchor.y);
+                        Edge rest = new Edge(rp1,rp2,edge.position,edge.itemView);
+                        output.add(rest);
+                    }
                     break;
                 case bottom:
+                    tl = new Point(backwardsAligned?anchor.x-w:anchor.x,anchor.y);
+                    edif = edge.getSize()-w;
+                    if(edif > 0){
+                        Point rp1 = new Point(backwardsAligned?anchor.x-edge.getSize():anchor.x+w,anchor.y);
+                        Point rp2 = new Point(rp1.x+edif,anchor.y);
+                        Edge rest = new Edge(rp1,rp2,edge.position,edge.itemView);
+                        output.add(rest);
+                    }
                     break;
                 case left:
+                    tl = new Point(anchor.x-w,backwardsAligned?anchor.y-h:anchor.y);
+                    edif = edge.getSize()-h;
+                    if(edif > 0){
+                        Point rp1 = new Point(anchor.x,backwardsAligned?anchor.y:anchor.y+h);
+                        Point rp2 = new Point(anchor.x,rp1.y+edif);
+                        Edge rest = new Edge(rp1,rp2,edge.position,edge.itemView);
+                        output.add(rest);
+                    }
                     break;
                 case right:
+                    tl = new Point(anchor.x,backwardsAligned?anchor.y-h:anchor.y);
+                    edif = edge.getSize()-h;
+                    if(edif > 0){
+                        Point rp1 = new Point(anchor.x,backwardsAligned?anchor.y:anchor.y+h);
+                        Point rp2 = new Point(anchor.x,rp1.y+edif);
+                        Edge rest = new Edge(rp1,rp2,edge.position,edge.itemView);
+                        output.add(rest);
+                    }
                     break;
                 default:
             }
+            tr = new Point(tl.x+w,tl.y);
+            bl = new Point(tl.x,tl.y+h);
+            br = new Point(tl.x+w,tl.y+h);
+            output.add(new Edge(tl,tr,Position.top,iv));
+            output.add(new Edge(bl,br,Position.bottom,iv));
+            output.add(new Edge(tl,bl,Position.left,iv));
+            output.add(new Edge(tr,br,Position.right,iv));
+            return output;
         }
 
         private AlignedEdge closestEdgeThatFits(int width,int height){
@@ -79,7 +194,7 @@ public class PrioritySoup extends ViewGroup {
                 EdgeOrient orientation = current.getOrientation();
                 int determiningSize = orientation==EdgeOrient.horizontal?width:height;
                 if(determiningSize >= current.getSize()){
-                    return new AlignedEdge(current,current.p1);
+                    return new AlignedEdge(current,current.p1, false);
                 }else{
                     Point p1 = current.p1;
                     Point p2 = current.p2;
@@ -89,7 +204,7 @@ public class PrioritySoup extends ViewGroup {
                         p1free = !intersects(p1,e);
                         p2free = !intersects(p2,e);
                     }
-                    if(p1free || p2free) return new AlignedEdge(current,p2free?p1:p2);
+                    if(p1free || p2free) return new AlignedEdge(current,p2free?p1:p2, !p2free);
                 }
             }
             return null;
@@ -107,22 +222,24 @@ public class PrioritySoup extends ViewGroup {
                 return false;
             }
         }
-        class AlignedEdge {
+        private class AlignedEdge {
             public final Edge E;
             public final Point ALIGNMENT;
-            AlignedEdge(Edge e, Point alignment) {
+            public final boolean BACKWARDS_ALIGNED;
+            AlignedEdge(Edge e, Point alignment, boolean backwards_aligned) {
                 E = e;
                 ALIGNMENT = alignment;
+                BACKWARDS_ALIGNED = backwards_aligned;
             }
         }
-        class Point{
+        private class Point{
             public int x,y;
             public Point(int x,int y){
                 this.x = x;
                 this.y = y;
             }
         }
-        class Edge{
+        private class Edge{
             public Position position;
             public ItemView itemView;
             public Point p1, p2;
@@ -144,6 +261,39 @@ public class PrioritySoup extends ViewGroup {
                 int dx = p2.x-p1.x;
                 int dy = p2.y-p1.y;
                 size = (int)Math.sqrt(dx*dx+dy*dy);
+            }
+        }
+
+        private class Quadruple {
+            int l,r,t,b;
+            ItemView iv;
+
+            private Quadruple(int l, int r, int t, int b, ItemView iv) {
+                this.l = l;
+                this.r = r;
+                this.t = t;
+                this.b = b;
+                this.iv = iv;
+            }
+
+            public int getLeft() {
+                return l;
+            }
+
+            public int getRight() {
+                return r;
+            }
+
+            public int getTop() {
+                return t;
+            }
+
+            public int getBottom() {
+                return b;
+            }
+
+            public ItemView getIv() {
+                return iv;
             }
         }
     }
