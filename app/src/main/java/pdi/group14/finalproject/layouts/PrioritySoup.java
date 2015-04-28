@@ -76,7 +76,8 @@ public class PrioritySoup extends ViewGroup {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         for(int i = 0; i < getChildCount(); i++){
             ItemView iv = (ItemView)getChildAt(i);
-            iv.layout();
+            Cluster.Quadruple q = cluster.getQuad(iv);
+            iv.layout(q.getLeft(),q.getTop(),q.getRight(),q.getBottom());
         }
 
     }
@@ -222,6 +223,14 @@ public class PrioritySoup extends ViewGroup {
                 return false;
             }
         }
+
+        public Quadruple getQuad(ItemView iv) {
+            for(Quadruple q : itemBounds){
+                if(q.getIv()==iv)return q;
+            }
+            return null;
+        }
+
         private class AlignedEdge {
             public final Edge E;
             public final Point ALIGNMENT;

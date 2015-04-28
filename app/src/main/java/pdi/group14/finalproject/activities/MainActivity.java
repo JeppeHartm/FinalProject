@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import pdi.group14.finalproject.R;
+import pdi.group14.finalproject.layouts.PrioritySoup;
 import pdi.group14.finalproject.model.Item;
 import pdi.group14.finalproject.model.ShoppingList;
 import pdi.group14.finalproject.views.ItemView;
@@ -16,6 +17,7 @@ import pdi.group14.finalproject.views.ItemView;
 public class MainActivity extends ActionBarActivity {
     ShoppingList shoppingList;
     RelativeLayout rl;
+    PrioritySoup ps;
     public MainActivity() {
         super();
         shoppingList = new ShoppingList();
@@ -25,17 +27,20 @@ public class MainActivity extends ActionBarActivity {
 
         ItemView iv = new ItemView(this,null,i);
 
-        rl.addView(iv);
-        RelativeLayout.LayoutParams lp;
-        lp = (RelativeLayout.LayoutParams)findViewById(R.id.defView).getLayoutParams();
-        lp.addRule(RelativeLayout.VISIBLE,RelativeLayout.TRUE);
-        iv.setLayoutParams(lp);
+        ps.addView(iv);
+//        RelativeLayout.LayoutParams lp;
+//        lp = (RelativeLayout.LayoutParams)findViewById(R.id.defView).getLayoutParams();
+//        lp.addRule(RelativeLayout.VISIBLE,RelativeLayout.TRUE);
+//        iv.setLayoutParams(lp);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rl = (RelativeLayout) findViewById(R.id.MainLayout);
+        ps = new PrioritySoup(this);
+        rl.addView(ps);
+
     }
 
 
