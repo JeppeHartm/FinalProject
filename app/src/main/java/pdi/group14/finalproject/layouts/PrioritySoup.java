@@ -82,19 +82,19 @@ public class PrioritySoup extends ViewGroup {
 
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int minx = 0,maxx = 0,miny = 0,maxy = 0;
-        for(Cluster.Quadruple q: cluster.itemBounds){
-            minx = q.getLeft()<minx?q.getLeft():minx;
-            maxx = q.getRight()>maxx?q.getRight():maxx;
-            miny = q.getBottom()<miny?q.getBottom():miny;
-            maxy = q.getTop()<maxy?q.getTop():maxy;
-        }
-        int width = maxx - minx;
-        int height = miny - maxy;
-        setMeasuredDimension(width,height);
-    }
+//    @Override
+//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+//        int minx = 0,maxx = 0,miny = 0,maxy = 0;
+//        for(Cluster.Quadruple q: cluster.itemBounds){
+//            minx = q.getLeft()<minx?q.getLeft():minx;
+//            maxx = q.getRight()>maxx?q.getRight():maxx;
+//            miny = q.getBottom()<miny?q.getBottom():miny;
+//            maxy = q.getTop()<maxy?q.getTop():maxy;
+//        }
+//        int width = maxx - minx;
+//        int height = miny - maxy;
+//        setMeasuredDimension(width,height);
+//    }
 
     class Cluster{
         ArrayList<Edge> freeEdges;

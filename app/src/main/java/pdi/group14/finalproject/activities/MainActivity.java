@@ -19,20 +19,23 @@ import pdi.group14.finalproject.views.ItemView;
 public class MainActivity extends ActionBarActivity {
     ShoppingList shoppingList;
     RelativeLayout rl;
-    PrioritySoup ps;
+    ProtoPrioritySoup ps;
     public MainActivity() {
         super();
         shoppingList = new ShoppingList();
+        ps = new ProtoPrioritySoup(this);
+        setContentView(ps);
     }
     public void addItem(String query){
         Item i = shoppingList.addItem(query);
 
         ItemView iv = new ItemView(this,null,i);
+
+        ps.addView(iv);
         ViewGroup.LayoutParams lp = iv.getLayoutParams();
         lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         lp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         iv.setLayoutParams(lp);
-        ps.addView(iv);
 //        RelativeLayout.LayoutParams lp;
 //        lp = (RelativeLayout.LayoutParams)findViewById(R.id.defView).getLayoutParams();
 //        lp.addRule(RelativeLayout.VISIBLE,RelativeLayout.TRUE);
@@ -43,7 +46,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rl = (RelativeLayout) findViewById(R.id.MainLayout);
-        ps = new PrioritySoup(this);
+
         rl.addView(ps);
 
     }
