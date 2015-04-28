@@ -5,10 +5,12 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import pdi.group14.finalproject.R;
 import pdi.group14.finalproject.layouts.PrioritySoup;
+import pdi.group14.finalproject.layouts.ProtoPrioritySoup;
 import pdi.group14.finalproject.model.Item;
 import pdi.group14.finalproject.model.ShoppingList;
 import pdi.group14.finalproject.views.ItemView;
@@ -26,7 +28,10 @@ public class MainActivity extends ActionBarActivity {
         Item i = shoppingList.addItem(query);
 
         ItemView iv = new ItemView(this,null,i);
-
+        ViewGroup.LayoutParams lp = iv.getLayoutParams();
+        lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        lp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        iv.setLayoutParams(lp);
         ps.addView(iv);
 //        RelativeLayout.LayoutParams lp;
 //        lp = (RelativeLayout.LayoutParams)findViewById(R.id.defView).getLayoutParams();

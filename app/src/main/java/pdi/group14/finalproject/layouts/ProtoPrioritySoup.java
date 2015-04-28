@@ -19,8 +19,10 @@ public class ProtoPrioritySoup extends ViewGroup {
         int y = t + (b-t)/2;
         for(int i = 0; i< getChildCount(); i++){
             View v = getChildAt(i);
+            int width = v.getWidth();
+            int height = v.getHeight();
             if( i == 0){
-                v.layout();
+                v.layout(x-width/2,y-height/2,x+width/2,y+height/2);
             }else if(i == 1){
 
             }else if(i == 2){
