@@ -1,12 +1,16 @@
 package pdi.group14.finalproject.layouts;
 
+import android.app.Application;
 import android.content.Context;
+import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 import pdi.group14.finalproject.model.Utilities;
 import pdi.group14.finalproject.views.ItemView;
@@ -76,30 +80,32 @@ public class PrioritySoup extends ViewGroup {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         for(int i = 0; i < getChildCount(); i++){
             ItemView iv = (ItemView)getChildAt(i);
-            Cluster.Quadruple q = cluster.getQuad(iv);
-            iv.layout(q.getLeft(),q.getTop(),q.getRight(),q.getBottom());
+            Cluster.Point tl = cluster.topLefts.get(iv);
+            Rect rect = iv.getSizeAsRect();
+            iv.layout(tl.x,tl.y,tl.x+rect.width(),tl.y+rect.height());
         }
 
     }
 
-//    @Override
-//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        int minx = 0,maxx = 0,miny = 0,maxy = 0;
-//        for(Cluster.Quadruple q: cluster.itemBounds){
-//            minx = q.getLeft()<minx?q.getLeft():minx;
-//            maxx = q.getRight()>maxx?q.getRight():maxx;
-//            miny = q.getBottom()<miny?q.getBottom():miny;
-//            maxy = q.getTop()<maxy?q.getTop():maxy;
-//        }
-//        int width = maxx - minx;
-//        int height = miny - maxy;
-//        setMeasuredDimension(width,height);
-//    }
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int minx = 0,maxx = 0,miny = 0,maxy = 0;
+        for(Cluster.Edge e: cluster.freeEdges){
+            minx = e.p1.x<minx?e.p1.x:minx;
+            maxx = e.p2.x>maxx?e.p2.x:maxx;
+            miny = e.p1.y<miny?e.p1.y:miny;
+            maxy = e.p2.y<maxy?e.p2.y:maxy;
+        }
+        int width = maxx - minx;
+        int height = miny - maxy;
+        Toast.makeText(this.getContext(),width+" "+height,Toast.LENGTH_SHORT).show();
+        setMeasuredDimension(width, height);
+    }
 
     class Cluster{
         ArrayList<Edge> freeEdges;
         ArrayList<ItemView> itemViews;
-        ArrayList<Quadruple> itemBounds;
+        public HashMap<ItemView,Point> topLefts;
         public Point getOrigin() {
             return origin;
         }
@@ -108,7 +114,6 @@ public class PrioritySoup extends ViewGroup {
         public Cluster(int x, int y){
             freeEdges = new ArrayList<Edge>();
             itemViews = new ArrayList<ItemView>();
-            itemBounds = new ArrayList<Quadruple>();
             origin = new Point(x,y);
             freeEdges.add(new Edge(origin,origin,Position.top,null));
         }
@@ -117,10 +122,9 @@ public class PrioritySoup extends ViewGroup {
             AlignedEdge best = closestEdgeThatFits(iv.getWidth(),iv.getHeight());
             freeEdges.remove(best.E);
             ArrayList<Edge> newEdges = (ArrayList<Edge>) generateEdges(best.E,iv,best.ALIGNMENT,best.BACKWARDS_ALIGNED);
-            Point tl = newEdges.get(1).p1;
             freeEdges.addAll(newEdges);
-            itemBounds.add(new Quadruple(tl.x,tl.x+iv.getWidth(),tl.y,tl.y+iv.getHeight(),iv));
             itemViews.add(iv);
+            topLefts.put(iv,newEdges.get(0).p1);
         }
         public void removeItem(ItemView iv){
             assert iv!=null;
@@ -139,14 +143,9 @@ public class PrioritySoup extends ViewGroup {
             for( ItemView e: (ArrayList<ItemView>)dep){
                 addItem(e);
             }
-            for( Quadruple q: itemBounds){
-                if(q.getIv()==iv){
-                    itemBounds.remove(q);
-                    break;
-                }
-            }
+            topLefts.remove(iv);
         }
-        private Collection<? extends Edge> generateEdges(Edge edge, ItemView iv, Point anchor, boolean backwardsAligned) {
+        private ArrayList<Edge> generateEdges(Edge edge, ItemView iv, Point anchor, boolean backwardsAligned) {
             ArrayList<Edge> output = new ArrayList<Edge>();
             int edif;
             int h = iv.getHeight(), w = iv.getWidth();
@@ -239,13 +238,6 @@ public class PrioritySoup extends ViewGroup {
             }
         }
 
-        public Quadruple getQuad(ItemView iv) {
-            for(Quadruple q : itemBounds){
-                if(q.getIv()==iv)return q;
-            }
-            return null;
-        }
-
         private class AlignedEdge {
             public final Edge E;
             public final Point ALIGNMENT;
@@ -288,37 +280,5 @@ public class PrioritySoup extends ViewGroup {
             }
         }
 
-        private class Quadruple {
-            int l,r,t,b;
-            ItemView iv;
-
-            private Quadruple(int l, int r, int t, int b, ItemView iv) {
-                this.l = l;
-                this.r = r;
-                this.t = t;
-                this.b = b;
-                this.iv = iv;
-            }
-
-            public int getLeft() {
-                return l;
-            }
-
-            public int getRight() {
-                return r;
-            }
-
-            public int getTop() {
-                return t;
-            }
-
-            public int getBottom() {
-                return b;
-            }
-
-            public ItemView getIv() {
-                return iv;
-            }
-        }
     }
 }

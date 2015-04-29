@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import java.util.Random;
@@ -24,6 +25,7 @@ public class MainActivity extends ActionBarActivity {
         super();
         shoppingList = new ShoppingList();
         Utilities.setSl(shoppingList);
+
     }
     public void addItem(String query){
         Item i = shoppingList.addItem(query);
@@ -40,7 +42,9 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ps = (PrioritySoup) findViewById(R.id.ShopItemLayout);
+        FrameLayout fl = (FrameLayout) findViewById(R.id.MainLayout);
+        ps = new PrioritySoup(this);
+        fl.addView(ps);
 
     }
 

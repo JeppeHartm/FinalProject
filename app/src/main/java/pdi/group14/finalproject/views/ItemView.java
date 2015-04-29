@@ -23,6 +23,10 @@ import pdi.group14.finalproject.model.Utilities;
  * Created by Jeppe on 07-04-2015.
  */
 public class ItemView extends View {
+    public Item getItem() {
+        return item;
+    }
+
     Item item;
     private final float MARGIN = 5;
     private final float PADDING = 2;
@@ -55,13 +59,17 @@ public class ItemView extends View {
         }
         return super.onTouchEvent(event);
     }
-
+    public Rect getSizeAsRect(){
+        float width = paintBucketText.measureText(item.getText());
+        float height = paintBucketText.getTextSize();
+        return new Rect(0,0,(int)(width+2*MARGIN+2*PADDING),(int)(height+2*MARGIN+2*PADDING));
+    }
     @Override
     protected void onDraw(Canvas canvas){
         //super.onDraw(canvas);
         float width = paintBucketText.measureText(item.getText());
         float height = paintBucketText.getTextSize();
-        Rect bounds = new Rect(0,0,(int)(width+MARGIN*2+PADDING*2),(int)(height+MARGIN*2+PADDING*2));
+        Rect bounds = getSizeAsRect();
         canvas.drawRect(bounds,paintBucketBackground);
         Rect innerBounds = new Rect((int)MARGIN,(int)MARGIN,(int)(bounds.right-MARGIN),(int)(bounds.bottom-MARGIN));
         canvas.drawRect(innerBounds,paintBucketBorder);
