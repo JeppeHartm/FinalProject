@@ -5,37 +5,31 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
+
+import java.util.Random;
 
 import pdi.group14.finalproject.R;
-import pdi.group14.finalproject.layouts.PrioritySoup;
-import pdi.group14.finalproject.layouts.ProtoPrioritySoup;
 import pdi.group14.finalproject.model.Item;
 import pdi.group14.finalproject.model.ShoppingList;
+import pdi.group14.finalproject.model.Utilities;
 import pdi.group14.finalproject.views.ItemView;
 
 
 public class MainActivity extends ActionBarActivity {
     ShoppingList shoppingList;
-    RelativeLayout rl;
-    ProtoPrioritySoup ps;
+    LinearLayout ll;
     public MainActivity() {
         super();
         shoppingList = new ShoppingList();
-        ps = new ProtoPrioritySoup(this);
-        setContentView(ps);
+        Utilities.setSl(shoppingList);
     }
     public void addItem(String query){
         Item i = shoppingList.addItem(query);
-
+        if(i == null)return;
         ItemView iv = new ItemView(this,null,i);
+        ll.addView(iv);
 
-        ps.addView(iv);
-        ViewGroup.LayoutParams lp = iv.getLayoutParams();
-        lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        lp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        iv.setLayoutParams(lp);
 //        RelativeLayout.LayoutParams lp;
 //        lp = (RelativeLayout.LayoutParams)findViewById(R.id.defView).getLayoutParams();
 //        lp.addRule(RelativeLayout.VISIBLE,RelativeLayout.TRUE);
@@ -45,9 +39,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        rl = (RelativeLayout) findViewById(R.id.MainLayout);
-
-        rl.addView(ps);
+        ll = (LinearLayout) findViewById(R.id.ShopItemLayout);
 
     }
 
@@ -75,6 +67,9 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void debug(View view){
-        addItem("test");
+        String q = "test";
+        for(int i = 0; i< 10; i++){
+            addItem(q+i);
+        }
     }
 }
