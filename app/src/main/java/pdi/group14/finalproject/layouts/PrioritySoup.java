@@ -67,17 +67,31 @@ public class PrioritySoup extends ViewGroup {
     @Override
     public void removeAllViewsInLayout() {
         super.removeAllViewsInLayout();
-        cluster = new Cluster(cluster.getOrigin().x,cluster.getOrigin().y);
+        cluster = new Cluster();
     }
 
 
     public PrioritySoup(Context context) {
         super(context);
-        cluster = new Cluster(getPaddingLeft()+(getWidth()/2),getPaddingTop()+(getHeight()/2));
+        cluster = new Cluster();
     }
 
+    private Rect getSizeAsRect(){
+        int minx = 0,maxx = 0,miny = 0,maxy = 0;
+        for(Cluster.Edge e: cluster.freeEdges){
+            minx = e.p1.x<minx?e.p1.x:minx;
+            maxx = e.p2.x>maxx?e.p2.x:maxx;
+            miny = e.p1.y<miny?e.p1.y:miny;
+            maxy = e.p2.y>maxy?e.p2.y:maxy;
+        }
+        int width = maxx - minx;
+        int height = maxy - miny;
+        return new Rect(0,0,width,height);
+    }
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        Rect lr = getSizeAsRect();
+
         for(int i = 0; i < getChildCount(); i++){
             ItemView iv = (ItemView)getChildAt(i);
             Cluster.Point tl = cluster.topLefts.get(iv);
@@ -89,39 +103,34 @@ public class PrioritySoup extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int minx = 0,maxx = 0,miny = 0,maxy = 0;
-        for(Cluster.Edge e: cluster.freeEdges){
-            minx = e.p1.x<minx?e.p1.x:minx;
-            maxx = e.p2.x>maxx?e.p2.x:maxx;
-            miny = e.p1.y<miny?e.p1.y:miny;
-            maxy = e.p2.y<maxy?e.p2.y:maxy;
-        }
-        int width = maxx - minx;
-        int height = miny - maxy;
+        Rect rect = getSizeAsRect();
+        int width = rect.width();
+        int height = rect.height();
         Toast.makeText(this.getContext(),width+" "+height,Toast.LENGTH_SHORT).show();
         setMeasuredDimension(width, height);
     }
 
     class Cluster{
+        private Point topLeft;
+        private Point bottomRight;
         ArrayList<Edge> freeEdges;
         ArrayList<ItemView> itemViews;
         public HashMap<ItemView,Point> topLefts;
-        public Point getOrigin() {
-            return origin;
-        }
 
-        Point origin;
-        public Cluster(int x, int y){
-            freeEdges = new ArrayList<Edge>();
-            itemViews = new ArrayList<ItemView>();
-            origin = new Point(x,y);
-            freeEdges.add(new Edge(origin,origin,Position.top,null));
+        public Cluster(){
+            topLeft = new Point(0,0);
+            bottomRight = new Point(0,0);
+            freeEdges = new ArrayList<>();
+            itemViews = new ArrayList<>();
+            Point o = new Point(0,0);
+            freeEdges.add(new Edge(o,o,Position.top,null));
+            topLefts = new HashMap<>();
         }
 
         public void addItem(ItemView iv){
             AlignedEdge best = closestEdgeThatFits(iv.getWidth(),iv.getHeight());
             freeEdges.remove(best.E);
-            ArrayList<Edge> newEdges = (ArrayList<Edge>) generateEdges(best.E,iv,best.ALIGNMENT,best.BACKWARDS_ALIGNED);
+            ArrayList<Edge> newEdges = generateEdges(best.E,iv,best.ALIGNMENT,best.BACKWARDS_ALIGNED);
             freeEdges.addAll(newEdges);
             itemViews.add(iv);
             topLefts.put(iv,newEdges.get(0).p1);
@@ -146,9 +155,10 @@ public class PrioritySoup extends ViewGroup {
             topLefts.remove(iv);
         }
         private ArrayList<Edge> generateEdges(Edge edge, ItemView iv, Point anchor, boolean backwardsAligned) {
-            ArrayList<Edge> output = new ArrayList<Edge>();
+            ArrayList<Edge> output = new ArrayList<>();
             int edif;
-            int h = iv.getHeight(), w = iv.getWidth();
+            Rect rect = iv.getSizeAsRect();
+            int h = rect.height(), w = rect.width();
             Point tl = null,tr,bl,br;
             switch(edge.position){
                 case top:
@@ -196,6 +206,10 @@ public class PrioritySoup extends ViewGroup {
             tr = new Point(tl.x+w,tl.y);
             bl = new Point(tl.x,tl.y+h);
             br = new Point(tl.x+w,tl.y+h);
+            topLeft.y = tl.y<topLeft.y?tl.y:topLeft.y;
+            topLeft.x = tl.x<topLeft.x?tl.x:topLeft.x;
+            bottomRight.y = br.y>bottomRight.y?br.y:bottomRight.y;
+            bottomRight.x = br.x>bottomRight.x?br.x:bottomRight.x;
             output.add(new Edge(tl,tr,Position.top,iv));
             output.add(new Edge(bl,br,Position.bottom,iv));
             output.add(new Edge(tl,bl,Position.left,iv));
