@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import java.util.Random;
 
 import pdi.group14.finalproject.R;
+import pdi.group14.finalproject.layouts.PrioritySoup;
 import pdi.group14.finalproject.model.Item;
 import pdi.group14.finalproject.model.ShoppingList;
 import pdi.group14.finalproject.model.Utilities;
@@ -18,7 +19,7 @@ import pdi.group14.finalproject.views.ItemView;
 
 public class MainActivity extends ActionBarActivity {
     ShoppingList shoppingList;
-    LinearLayout llcoolj;
+    PrioritySoup ps;
     public MainActivity() {
         super();
         shoppingList = new ShoppingList();
@@ -28,7 +29,7 @@ public class MainActivity extends ActionBarActivity {
         Item i = shoppingList.addItem(query);
         if(i == null)return;
         ItemView iv = new ItemView(this,null,i);
-        ll.addView(iv);
+        ps.addView(iv);
 
 //        RelativeLayout.LayoutParams lp;
 //        lp = (RelativeLayout.LayoutParams)findViewById(R.id.defView).getLayoutParams();
@@ -39,7 +40,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ll = (LinearLayout) findViewById(R.id.ShopItemLayout);
+        ps = (PrioritySoup) findViewById(R.id.ShopItemLayout);
 
     }
 
