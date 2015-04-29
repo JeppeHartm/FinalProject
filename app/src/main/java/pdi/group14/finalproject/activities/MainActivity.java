@@ -72,4 +72,7 @@ public class MainActivity extends ActionBarActivity {
             addItem(q+i);
         }
     }
+    public void openType(View view){
+        findViewById(R.id.typing_layout).setVisibility(View.VISIBLE);
+    }
 }
