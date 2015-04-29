@@ -18,7 +18,7 @@ import pdi.group14.finalproject.views.ItemView;
 
 public class MainActivity extends ActionBarActivity {
     ShoppingList shoppingList;
-    LinearLayout ll;
+    LinearLayout llcoolj;
     public MainActivity() {
         super();
         shoppingList = new ShoppingList();
