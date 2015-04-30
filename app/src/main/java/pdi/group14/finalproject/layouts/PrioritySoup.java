@@ -128,7 +128,9 @@ public class PrioritySoup extends ViewGroup {
         }
 
         public void addItem(ItemView iv){
-            AlignedEdge best = closestEdgeThatFits(iv.getWidth(),iv.getHeight());
+            Rect rect = iv.getSizeAsRect();
+            int h = rect.height(), w = rect.width();
+            AlignedEdge best = closestEdgeThatFits(w,h);
             freeEdges.remove(best.E);
             ArrayList<Edge> newEdges = generateEdges(best.E,iv,best.ALIGNMENT,best.BACKWARDS_ALIGNED);
             freeEdges.addAll(newEdges);
