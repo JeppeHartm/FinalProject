@@ -1,6 +1,7 @@
 package pdi.group14.finalproject.activities;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,9 +15,10 @@ import pdi.group14.finalproject.model.Item;
 import pdi.group14.finalproject.model.ShoppingList;
 import pdi.group14.finalproject.model.Utilities;
 import pdi.group14.finalproject.views.ItemView;
+import pdi.group14.finalproject.views.ListItemView;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
     ShoppingList shoppingList;
     LinearLayout ll;
     public MainActivity() {
@@ -44,35 +46,16 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     public void debug(View view){
-        String q = "test";
-        for(int i = 0; i< 10; i++){
-            addItem(q+i);
-        }
+//        String q = "test";
+//        for(int i = 0; i< 10; i++){
+//            addItem(q+i);
+//        }
+        startActivity(new Intent(this,listActivity.class));
+        //addItem();
     }
-    public void openType(View view){
+    /*public void openType(View view){
         findViewById(R.id.typing_layout).setVisibility(View.VISIBLE);
-    }
+    }*/
 }
